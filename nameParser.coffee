@@ -48,28 +48,27 @@ CAPITALIZATION_EXCEPTIONS = {
 }
 CONJUNCTIONS = ['&', 'and', 'et', 'e', 'und', 'y']
 
-re_spaces = /\s+/
-re_spaces_g = /\s+/g
+re_spaces = /\s+/g
 re_word = /\w+/
 re_mac = /^(ma?c)(\w)/i
-re_initial = /^\w\.|[A_Z])?$/
+re_initial = /^(\w\.|[A_Z])?$/
 
 lc = (value) ->
-    return "" if not value:
+    return "" if not value
     return value.toLowerCase().replace('.','')
 
 is_not_initial = (value) ->
     return not value.match(re_initial)
 
 class HumanName
-    constructor: (@full_name='', titles=TITLES, prefices=PREFICES, suffices=SUFFICES, punc_titles=PUNC_TITLES, conjunctions=CONJUNCTIONS, capitalization_exceptions=CAPITALIZATION_EXCEPTIONS) ->
-        this.titles = titles
-        this.punc_titles = punc_titles
-        this.conjunctions = conjunctions
-        this.prefices = prefices
-        this.suffices = suffices
-        this.capitalization_exceptions = capitalization_exceptions
-        this.full_name = full_name
+    constructor: (@full_name='', @titles=TITLES, @prefices=PREFICES, @suffices=SUFFICES, @punc_titles=PUNC_TITLES, @conjunctions=CONJUNCTIONS, @capitalization_exceptions=CAPITALIZATION_EXCEPTIONS) ->
+        this.titles = @titles
+        this.punc_titles = @punc_titles
+        this.conjunctions = @conjunctions
+        this.prefices = @prefices
+        this.suffices = @suffices
+        this.capitalization_exceptions = @capitalization_exceptions
+        this.full_name = @full_name
         this.title = ""
         this.first = ""
         this.suffixes = []
@@ -78,28 +77,28 @@ class HumanName
         this.unparsable = false
         this.count = 0
         this.members = ['title','first','middle','last','suffix']
-        if this.full_name:
+        if this.full_name
             this.parse_full_name()
 
     middle: -> this.middle_names.join(' ')
 
-    last: -> this.last_name.join(' ')
+    last: -> this.last_names.join(' ')
 
     suffix: -> this.suffixes.join(', ')
 
-    is_conjunction: (piece) -> lc(piece) in this.conjunctions and is_not_initial(piece)
+    is_conjunction: (@piece) -> lc(@piece) in this.conjunctions and is_not_initial(@piece)
 
-    is_prefix: (piece) -> lc(piece) in this.prefices and is_not_initial(piece)
+    is_prefix: (@piece) -> lc(@piece) in this.prefices and is_not_initial(@piece)
 
     parse_full_name: ->
-        if not this.full_name:
+        if not this.full_name
             throw "Missing full_name"
 
         #if not isinstance(self.full_name, unicode):
         #    self.full_name = unicode(self.full_name, ENCODING)
 
         # collapse multiple spaces
-        this.full_name = this.full_name.trim().replace(re_spaces_g, ' ')
+        this.full_name = this.full_name.trim().replace(re_spaces, ' ')
 
         # reset values
         this.title = ""
@@ -110,150 +109,176 @@ class HumanName
         this.unparsable = false
 
         # break up full_name by commas
-        parts = [x.trim() for x in this.full_name.split(",")]
+        parts = (x.trim() for x in this.full_name.split(","))
 
         #log.debug(u"full_name: " + self.full_name)
         #log.debug(u"parts: " + unicode(parts))
 
         pieces = []
-        if parts.length == 1:
+        if parts.length == 1
 
-            # no commas, title first middle middle middle last suffix
+            # 'no commas, title first middle middle middle last suffix'
 
-            for part in parts:
+            for part in parts
+                part = String(part)
                 names = part.split(' ')
-                for name in names:
-                    name.replace(',','').trim()
+                for name in names
+                    name = name.replace(',','').trim()
                     pieces.push(name)
 
-            log.debug(u"pieces: " + unicode(pieces))
+            #log.debug(u"pieces: " + unicode(pieces))
 
-            for i, piece in enumerate(pieces):
             i = 0
             while i < pieces.length
                 piece = pieces[i]
                 try
                     next = pieces[i + 1]
                 catch error
-                    next = None
+                    next = null
 
                 try
                     prev = pieces[i - 1]
                 catch error
-                    prev = None
+                    prev = null
 
-                if lc(piece) in this.titles:
+                if lc(piece) in this.titles
                     this.title = piece
+                    i += 1
                     continue
-                if piece.toLowerCase() in this.punc_titles:
+                if piece.toLowerCase() in this.punc_titles
                     this.title = piece
+                    i += 1
                     continue
-                if not this.first:
+                if not this.first
                     this.first = piece.replace(".","")
+                    i += 1
                     continue
-                if (i == pieces.length - 2) and (lc(next) in this.suffices):
+                if (i == pieces.length - 2) and (lc(next) in this.suffices)
                     this.last_names.push(piece)
                     this.suffixes.push(next)
                     break
-                if this.is_prefix(piece):
+                if this.is_prefix(piece)
                     this.last_names.push(piece)
+                    i += 1
                     continue
-                if this.is_conjunction(piece) and i < pieces.length / 2:
+                if this.is_conjunction(piece) and i < pieces.length / 2
                     this.first += ' ' + piece
+                    i += 1
                     continue
-                if this.is_conjunction(prev) and (i-1) < pieces.length / 2:
+                if this.is_conjunction(prev) and (i-1) < pieces.length / 2
                     this.first += ' ' + piece
+                    i += 1
                     continue
-                if this.is_conjunction(piece) or this.is_conjunction(next):
+                if this.is_conjunction(piece) or this.is_conjunction(next)
                     this.last_names.push(piece)
+                    i += 1
                     continue
-                if i == pieces.length - 1:
+                if i == pieces.length - 1
                     this.last_names.push(piece)
+                    i += 1
                     continue
                 this.middle_names.push(piece)
                 i += 1
                 ###
                    Got to here
                 ###
-        else:
-            if lc(parts[1]) in this.suffices:
+        else
+            if lc(parts[1]) in this.suffices
 
-                # title first middle last, suffix [, suffix]
+                # 'title first middle last, suffix [, suffix]'
 
                 names = parts[0].split(' ')
-                for name in names:
-                    name.replace(',','').strip()
-                    pieces.append(name)
+                for name in names
+                    name = name.replace(',','').trim()
+                    pieces.push(name)
 
-                log.debug(u"pieces: " + unicode(pieces))
+                #log.debug(u"pieces: " + unicode(pieces))
 
-                this.suffixes += parts[1:]
+                this.suffixes.push part for part in parts[1..parts.length]
 
-                for i, piece in enumerate(pieces):
-                    try:
+                while i < pieces.length
+                    piece = pieces[i]
+                    try
                         next = pieces[i + 1]
-                    except IndexError:
-                        next = None
+                    catch error
+                        next = null
 
-                    if lc(piece) in this.titles:
+                    if lc(piece) in this.titles
                         this.title = piece
+                        i += 1
                         continue
-                    if piece.lower() in this.punc_titles:
+                    if piece.toLowerCase() in this.punc_titles
                         this.title = piece
+                        i += 1
                         continue
-                    if not this.first:
+                    if not this.first
                         this.first = piece.replace(".","")
+                        i += 1
                         continue
-                    if i == (len(pieces) -1) and this.is_prefix(piece) and next:
-                        this.last_names.append(piece + " " + next)
+                    if i == (pieces.length -1) and this.is_prefix(piece) and next
+                        this.last_names.push(piece + " " + next)
                         break
-                    if this.is_prefix(piece):
-                        this.last_names.append(piece)
+                    if this.is_prefix(piece)
+                        this.last_names.push(piece)
+                        i += 1
                         continue
-                    if this.is_conjunction(piece) or this.is_conjunction(next):
-                        this.last_names.append(piece)
+                    if this.is_conjunction(piece) or this.is_conjunction(next)
+                        this.last_names.push(piece)
+                        i += 1
                         continue
-                    if i == len(pieces) - 1:
-                        this.last_names.append(piece)
+                    if i == pieces.length - 1
+                        this.last_names.push(piece)
+                        i += 1
                         continue
-                    this.middle_names.append(piece)
-            else:
+                    this.middle_names.push(piece)
+                    i += 1
+            else
 
-                # last, title first middles[,] suffix [,suffix]
+                # 'last, title first middles[,] suffix [,suffix]'
 
                 names = parts[1].split(' ')
-                for name in names:
-                    name.replace(',','').strip()
-                    pieces.append(name)
+                for name in names
+                    name = name.replace(',','').trim()
+                    pieces.push(name)
 
-                log.debug(u"pieces: " + unicode(pieces))
+                #log.debug(u"pieces: " + unicode(pieces))
 
-                this.last_names.append(parts[0])
-                for i, piece in enumerate(pieces):
-                    try:
+                this.last_names.push parts[0]
+                i = 0
+                while i < pieces.length
+                    piece = pieces[i]
+                    try
                         next = pieces[i + 1]
-                    except IndexError:
-                        next = None
+                    catch error
+                        next = null
 
-                    if lc(piece) in this.titles:
+                    if lc(piece) in this.titles
                         this.title = piece
+                        i += 1
                         continue
-                    if piece.lower() in this.punc_titles:
+                    if piece.toLowerCase() in this.punc_titles
                         this.title = piece
+                        i += 1
                         continue
-                    if not this.first:
+                    if not this.first
                         this.first = piece.replace(".","")
+                        i += 1
                         continue
-                    if lc(piece) in this.suffices:
-                        this.suffixes.append(piece)
+                    if lc(piece) in this.suffices
+                        this.suffixes.push(piece)
+                        i += 1
                         continue
-                    this.middle_names.append(piece)
-                try:
-                    if parts[2]:
-                        this.suffixes += parts[2:]
-                except IndexError:
-                    pass
+                    this.middle_names.push(piece)
+                    i += 1
+                try
+                    if parts[2]
+                        this.suffixes.push part for part in parts[2..parts.length]
+                catch error
+                    null
 
-        if not this.first and len(this.middle_names) < 1 and len(this.last_names) < 1:
-            this.unparsable = True
-            log.error(u"Unparsable full_name: " + this.full_name)
+        if not this.first and this.middle_names.length < 1 and this.last_names.length < 1
+            this.unparsable = true
+            #log.error(u"Unparsable full_name: " + this.full_name)
+
+exports.parse_human_name = (name) ->
+    new HumanName name
