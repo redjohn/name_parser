@@ -1,4 +1,4 @@
-parser = require '../nameParser'
+parser = require '../name_parser'
 
 describe "Name Parser", ->
     it "should parse the name format 'first middle(s) last[,] suffix(es)'", ->
