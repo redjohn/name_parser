@@ -1,7 +1,7 @@
 ###
 A simple script for parsing human names into their individual components.
 
-Components::
+Parses names into 5 components:
 
     * Title
     * First name
@@ -9,29 +9,28 @@ Components::
     * Last names
     * Suffixes
 
-Works for a variety of common name formats for latin-based languages. Over
-100 unit tests with example names. Should be unicode safe but it's fairly untested.
-
-HumanName instances will pass an equals (==) test if their string representations are the same.
-
 --------
 
-Copyright Derek Gulbranson, May 2009 <derek73 at gmail>.
-http://code.google.com/p/python-nameparser
+Copyright John Griffey, March 2011 <redjohn367 at gmail>.
 
-Parser logic based on PHP nameParser.php by G. Miernicki
-http://code.google.com/p/nameparser/
+Parser logic (which means most of the heavy lifting) based on the Python
+name parser by Derek Gulbranson:
+    http://code.google.com/p/python-nameparser
+which was based on the PHP nameParser.php by G. Miernicki:
+    http://code.google.com/p/nameparser/
 
-LGPL
-http://www.opensource.org/licenses/lgpl-license.html
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser
-General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at
-your option) any later version.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
-implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
-License for more details.
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ###
 
 TITLES = ['dr','doctor','miss','misses','mr','mister','mrs','ms','judge','sir','rev','madam','madame','AB','2ndLt','Amn','1stLt','A1C','Capt','SrA','Maj','SSgt','LtCol','TSgt','Col','BrigGen','1stSgt','MajGen','SMSgt','LtGen','1stSgt','Gen','CMSgt','1stSgt','CCMSgt','CMSAF','PVT','2LT','PV2','1LT','PFC','CPT','SPC','MAJ','CPL','LTC','SGT','COL','SSG','BG','SFC','MG','MSG','LTG','1SGT','GEN','SGM','CSM','SMA','WO1','WO2','WO3','WO4','WO5','ENS','SA','LTJG','SN','LT','PO3','LCDR','PO2','CDR','PO1','CAPT','CPO','RADM(LH)','SCPO','RADM(UH)','MCPO','VADM','MCPOC','ADM','MPCO-CG','CWO-2','CWO-3','CWO-4','Pvt','2ndLt','PFC','1stLt','LCpl','Capt','Cpl','Maj','Sgt','LtCol','SSgt','Col','GySgt','BGen','MSgt','MajGen','1stSgt','LtGen','MGySgt','Gen','SgtMaj','SgtMajMC','WO-1','CWO-2','CWO-3','CWO-4','CWO-5','ens','sa','ltjg','sn','lt','po3','lcdr','po2','cdr','po1','capt','cpo','rdml','scpo','radm','mcpo','vadm','mcpon','adm','fadm','wo1','cwo2','cwo3','cwo4','cwo5']
