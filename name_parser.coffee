@@ -263,7 +263,7 @@ class HumanName
                     i += 1
                 try
                     if parts[2]
-                        @suffixes.push part for part in parts[2..parts.length]
+                        (@suffixes.push suffix for suffix in part.split(' ')) for part in parts[2..parts.length]
                 catch error
                     null
 
