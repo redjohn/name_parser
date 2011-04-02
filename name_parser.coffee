@@ -242,24 +242,21 @@ class HumanName
                     catch error
                         next = null
 
+                    i += 1
+
                     if lc(piece) in @titles
                         @title = piece
-                        i += 1
                         continue
                     if piece.toLowerCase() in @punc_titles
                         @title = piece
-                        i += 1
                         continue
                     if not @first
                         @first = piece.replace(".","")
-                        i += 1
                         continue
                     if lc(piece) in @suffices
                         @suffixes.push(piece)
-                        i += 1
                         continue
                     @middle_names.push(piece)
-                    i += 1
                 try
                     if parts[2]
                         (@suffixes.push suffix for suffix in part.split(' ')) for part in parts[2..parts.length]
